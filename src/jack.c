@@ -6,8 +6,6 @@
 
 #include "common.h"
 
-#include <math.h>
-
 typedef struct {
     jack_port_t **output;
     jack_client_t *client;
@@ -16,38 +14,29 @@ typedef struct {
 
 int jack_process_callback(jack_nframes_t nframes, void *args) {
     ProcessCallbackArgs *process_args = args;
+
     jack_nframes_t current_frames;
     jack_time_t current_usecs, next_usecs;
     float period_usecs;
-
-    jack_get_cycle_times(process_args->client, &current_frames, &current_usecs, &next_usecs, &period_usecs);
-
-//    printf("Current frames: %d\n", current_frames);
-//    printf("Current usecs: %ld\n", current_usecs);
-//    printf("Next usecs: %ld\n", next_usecs);
-//    printf("Period usecs: %f\n", period_usecs);
-//    printf("Calculated period usecs: %ld\n", next_usecs - current_usecs);
-//    printf("Frame time: %f\n", period_usecs / nframes);
-//    printf("Next frame usecs: %f\n", current_usecs + period_usecs / nframes);
-//    printf("\n");
+    jack_get_cycle_times(
+        process_args->client,
+        &current_frames,
+        &current_usecs,
+        &next_usecs,
+        &period_usecs
+    );
 
     jack_default_audio_sample_t *output_buffer[2];
-
     output_buffer[0] = jack_port_get_buffer(process_args->output[0], nframes);
     output_buffer[1] = jack_port_get_buffer(process_args->output[1], nframes);
 
-    float frame_usecs = period_usecs / nframes;
+    double frame_usecs = period_usecs / nframes;
     for (int i = 0; i < nframes; i++) {
-//        output_buffer[0][i] = output_buffer[1][i] = sin(
-//            2 * 3.14159265359f * 440.0f *
-//            (((double) current_usecs + (double) frame_usecs * i) / 1000000.0f)
-//        );
-
-        output_buffer[0][i] = output_buffer[1][i] = process_args->synth_callback(
-            (((double) current_usecs + (double) frame_usecs * i) / 1000000.0f)
-        );
+        output_buffer[0][i] = output_buffer[1][i] =
+            (float) process_args->synth_callback(
+                ((current_usecs + frame_usecs * i) / 1000000.0)
+            );
     }
-
 
     return 0;
 }
@@ -70,8 +59,8 @@ int jack_connect_to_physical_output(jack_client_t *client, jack_port_t **output)
 
     for (int i = 0; i < 2; i++) {
         if (jack_connect(client, jack_port_name(output[i]), physical_output[i])) {
-            free(physical_output);
             fprintf(stderr, "Cannot connect output ports\n");
+            free(physical_output);
             return 1;
         }
     }

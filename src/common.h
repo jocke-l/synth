@@ -1,6 +1,6 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-typedef float (*SynthCallback)(double time);
+typedef double (*SynthCallback)(double time);
 
 #endif

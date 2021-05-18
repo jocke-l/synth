@@ -5,11 +5,10 @@
 
 #define PI 3.14159265359
 
-float synth_callback(double time) {
+double synth_callback(double time) {
     return square_oscillator(
         (
             time + sine_oscillator(
-//                time,
                 time + sine_oscillator(time, 0.05, 1),
                 55,
                 0.015
@@ -21,32 +20,32 @@ float synth_callback(double time) {
     );
 }
 
-float sine_oscillator(double time, float frequency, float amplitude) {
+double sine_oscillator(double time, double frequency, double amplitude) {
     return sin(2 * PI * frequency * time) * amplitude;
 }
 
-float square_oscillator(
+double square_oscillator(
     double time,
-    float frequency,
-    float amplitude,
+    double frequency,
+    double amplitude,
     int num_harmonics
 ) {
-    float square = 0.0f;
+    double square = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
         int k = 2 * i + 1;
-        square += 1.0f / k * sine_oscillator(time, k * frequency, amplitude);
+        square += 1.0 / k * sine_oscillator(time, k * frequency, amplitude);
     }
 
     return square;
 }
 
-float sawtooth_oscillator(
+double sawtooth_oscillator(
     double time,
-    float frequency,
-    float amplitude,
+    double frequency,
+    double amplitude,
     int num_harmonics
 ) {
-    float sawtooth = 0.0f;
+    double sawtooth = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
         int k = i + 1;
         sawtooth += sine_oscillator(time, k * frequency, amplitude) / k;
@@ -55,17 +54,17 @@ float sawtooth_oscillator(
     return sawtooth;
 }
 
-float triangle_oscillator(
+double triangle_oscillator(
     double time,
-    float frequency,
-    float amplitude,
+    double frequency,
+    double amplitude,
     int num_harmonics
 ) {
-    float triangle = 0.0f;
+    double triangle = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
         int k = 2 * i + 1;
         triangle += (
-            (pow(-1, (k - 1) / 2.0f) / pow(k, 2)) *
+            (pow(-1, (k - 1) / 2.0) / pow(k, 2)) *
             sine_oscillator(time, k * frequency, amplitude)
         );
     }
@@ -73,6 +72,6 @@ float triangle_oscillator(
     return triangle;
 }
 
-float white_noise(float amplitude) {
-    return 1.0f / (rand() + 1) * amplitude;
+double white_noise(double amplitude) {
+    return rand() / RAND_MAX  * amplitude;
 }
