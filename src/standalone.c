@@ -1,20 +1,51 @@
 #include <stdio.h>
-
 #include <unistd.h>
 
+#include "nuklear.h"
+#include "ui.h"
 #include "audio.h"
 #include "synth.h"
+
+static void on_quit_event(void*);
 
 int main(int argc, char **argv) {
     Synth synth = (Synth) {
         .volume = 0.3,
     };
 
-    if (audio_init_client("synth", synth_callback, &synth)) {
-        // Some logging
+    if (audio_init_client("synth", synth_callback, &synth))
+        goto fin_0;
+
+    ui_init();
+    UI* ui = ui_create("standalone", 1200, 800);
+    if (!ui)
+        goto fin_1;
+
+    int should_quit = 0;
+    ui_set_on_quit_event(ui, on_quit_event, &should_quit);
+    while(!should_quit) {
+        ui_handle_events(ui);
+
+        struct nk_context *nuklear_context = ui_get_nuklear_context(ui);
+        if (nk_begin(nuklear_context, "synth", nk_rect(50, 50, 230, 250),
+            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+            NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE
+        )) {
+            synth_update_ui(nuklear_context, &synth);
+        }
+        nk_end(nuklear_context);
+
+        ui_render_frame(ui);
     }
-
-    sleep(-1);
-
+    ui_destroy(ui);
+    ui_deinit();
     return 0;
+
+fin_1: ui_deinit();
+fin_0: return -1;
+}
+
+static void on_quit_event(void *context)
+{
+    *(int*)context = 1;
 }

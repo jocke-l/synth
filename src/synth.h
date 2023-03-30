@@ -6,6 +6,9 @@ typedef struct {
 
 double synth_callback(double time, const void* synth_context);
 
+struct nk_context;
+void synth_update_ui(struct nk_context *, Synth *);
+
 double sine_oscillator(double time, double frequency, double amplitude);
 
 double square_oscillator(
