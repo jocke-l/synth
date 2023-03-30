@@ -10,6 +10,7 @@ typedef struct {
     jack_port_t **output;
     jack_client_t *client;
     SynthCallback synth_callback;
+    const void *synth_context;
 } ProcessCallbackArgs;
 
 static int audio_process_callback(jack_nframes_t nframes, void *args) {
@@ -34,7 +35,7 @@ static int audio_process_callback(jack_nframes_t nframes, void *args) {
     for (int i = 0; i < nframes; i++) {
         output_buffer[0][i] = output_buffer[1][i] =
             (float) process_args->synth_callback(
-                ((current_usecs + frame_usecs * i) / 1000000.0)
+                ((current_usecs + frame_usecs * i) / 1000000.0), process_args->synth_context
             );
     }
 
@@ -101,7 +102,7 @@ static jack_port_t **audio_create_output(jack_client_t *client) {
     return output;
 }
 
-int audio_init_client(char *client_name, SynthCallback synth_callback) {
+int audio_init_client(char *client_name, SynthCallback synth_callback, const void *synth_context) {
     jack_status_t status;
     jack_client_t *client = jack_client_open(
         client_name,
@@ -128,6 +129,7 @@ int audio_init_client(char *client_name, SynthCallback synth_callback) {
     }
     process_args->synth_callback = synth_callback;
     process_args->client = client;
+    process_args->synth_context = synth_context;
 
     jack_set_process_callback(client, audio_process_callback, process_args);
     jack_on_shutdown(client, audio_shutdown_callback, 0);

@@ -1,7 +1,9 @@
-#ifndef __SYNTH_H__
-#define __SYNTH_H__
+#pragma once
 
-double synth_callback(double time);
+typedef struct {
+} Synth;
+
+double synth_callback(double time, const void* synth_context);
 
 double sine_oscillator(double time, double frequency, double amplitude);
 
@@ -28,5 +30,3 @@ double triangle_oscillator(
 );
 
 double white_noise(double amplitude);
-
-#endif

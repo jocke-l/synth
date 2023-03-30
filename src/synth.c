@@ -5,7 +5,7 @@
 
 #define PI 3.14159265359
 
-double synth_callback(double time) {
+double synth_callback(double time, const void* context) {
     return square_oscillator(
         (
             time + sine_oscillator(

@@ -6,7 +6,10 @@
 #include "synth.h"
 
 int main(int argc, char **argv) {
-    if (audio_init_client("synth", synth_callback)) {
+    Synth synth = (Synth) {
+    };
+
+    if (audio_init_client("synth", synth_callback, &synth)) {
         // Some logging
     }
 

@@ -1,6 +1,3 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#pragma once
 
-typedef double (*SynthCallback)(double time);
-
-#endif
+typedef double (*SynthCallback)(double time, const void *context);
