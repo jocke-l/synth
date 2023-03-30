@@ -2,11 +2,11 @@
 
 #include <unistd.h>
 
-#include "jack.h"
+#include "audio.h"
 #include "synth.h"
 
 int main(int argc, char **argv) {
-    if (jack_init_client("synth", synth_callback)) {
+    if (audio_init_client("synth", synth_callback)) {
         // Some logging
     }
 

@@ -12,7 +12,7 @@ typedef struct {
     SynthCallback synth_callback;
 } ProcessCallbackArgs;
 
-int jack_process_callback(jack_nframes_t nframes, void *args) {
+static int audio_process_callback(jack_nframes_t nframes, void *args) {
     ProcessCallbackArgs *process_args = args;
 
     jack_nframes_t current_frames;
@@ -41,10 +41,10 @@ int jack_process_callback(jack_nframes_t nframes, void *args) {
     return 0;
 }
 
-void jack_shutdown_callback(void *args) {
+static void audio_shutdown_callback(void *args) {
 }
 
-int jack_connect_to_physical_output(jack_client_t *client, jack_port_t **output) {
+static int audio_connect_to_physical_output(jack_client_t *client, jack_port_t **output) {
     const char **physical_output = jack_get_ports(
         client,
         NULL,
@@ -70,7 +70,7 @@ int jack_connect_to_physical_output(jack_client_t *client, jack_port_t **output)
     return 0;
 }
 
-jack_port_t **jack_create_output(jack_client_t *client) {
+static jack_port_t **audio_create_output(jack_client_t *client) {
     jack_port_t **output;
 
     if ((output = malloc(sizeof(jack_port_t *) * 2)) == NULL) {
@@ -101,7 +101,7 @@ jack_port_t **jack_create_output(jack_client_t *client) {
     return output;
 }
 
-int jack_init_client(char *client_name, SynthCallback synth_callback) {
+int audio_init_client(char *client_name, SynthCallback synth_callback) {
     jack_status_t status;
     jack_client_t *client = jack_client_open(
         client_name,
@@ -129,11 +129,11 @@ int jack_init_client(char *client_name, SynthCallback synth_callback) {
     process_args->synth_callback = synth_callback;
     process_args->client = client;
 
-    jack_set_process_callback(client, jack_process_callback, process_args);
-    jack_on_shutdown(client, jack_shutdown_callback, 0);
+    jack_set_process_callback(client, audio_process_callback, process_args);
+    jack_on_shutdown(client, audio_shutdown_callback, 0);
 
     jack_port_t **output;
-    if ((output = jack_create_output(client)) == NULL) {
+    if ((output = audio_create_output(client)) == NULL) {
         return 1;
     }
     process_args->output = output;
@@ -143,7 +143,7 @@ int jack_init_client(char *client_name, SynthCallback synth_callback) {
         return 1;
     }
 
-    if (jack_connect_to_physical_output(client, output)) {
+    if (audio_connect_to_physical_output(client, output)) {
         return 1;
     }
 
