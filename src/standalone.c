@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "nuklear.h"
-#include "ui.h"
 #include "audio.h"
+#include "nuklear.h"
 #include "synth.h"
+#include "ui.h"
 
 static void on_quit_event(void*);
 
@@ -13,7 +13,8 @@ int main(int argc, char **argv) {
         .volume = 0.3,
     };
 
-    if (audio_init_client("synth", synth_callback, &synth))
+    AudioClient* audio_client = audio_client_create("synth", synth_callback, &synth);
+    if (!audio_client)
         goto fin_0;
 
     ui_init();
@@ -39,9 +40,12 @@ int main(int argc, char **argv) {
     }
     ui_destroy(ui);
     ui_deinit();
+    audio_client_destroy(audio_client);
     return 0;
 
-fin_1: ui_deinit();
+fin_1:
+    ui_deinit();
+    audio_client_destroy(audio_client);
 fin_0: return -1;
 }
 
