@@ -1,6 +1,7 @@
 #pragma once
 
 typedef struct {
+    _Atomic double volume;
 } Synth;
 
 double synth_callback(double time, const void* synth_context);
