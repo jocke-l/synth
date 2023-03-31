@@ -21,3 +21,5 @@ run_command('git', [
 ], check: true)
 
 subdir('src')
+
+run_target('run', command: synth_exe)
