@@ -34,7 +34,7 @@ static int audio_process_callback(jack_nframes_t nframes, void *args) {
     output_buffer[1] = jack_port_get_buffer(audio_client->outputs[1], nframes);
 
     double frame_usecs = period_usecs / nframes;
-    for (int i = 0; i < nframes; i++) {
+    for (unsigned int i = 0; i < nframes; i++) {
         output_buffer[0][i] = output_buffer[1][i] =
             (float) audio_client->synth_callback(
                 ((current_usecs + frame_usecs * i) / 1000000.0), audio_client->synth_context
