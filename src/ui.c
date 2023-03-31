@@ -15,10 +15,11 @@ struct UIContext {
     void *on_quit_context;
 } static ui_invalid = { 0 };
 
-void ui_init(void)
+int ui_init(void)
 {
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
-    SDL_Init(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+        return -1;
 }
 
 void ui_deinit(void)

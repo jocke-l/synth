@@ -14,10 +14,11 @@ int main(void) {
     if (!audio_client)
         goto fin_0;
 
-    ui_init();
+    if (ui_init() < 0)
+        goto fin_1;
     UI* ui = ui_create("standalone", 1200, 800);
     if (!ui)
-        goto fin_1;
+        goto fin_2;
 
     int should_quit = 0;
     ui_set_on_quit_event(ui, on_quit_event, &should_quit);
@@ -40,9 +41,8 @@ int main(void) {
     audio_client_destroy(audio_client);
     return 0;
 
-fin_1:
-    ui_deinit();
-    audio_client_destroy(audio_client);
+fin_2: ui_deinit();
+fin_1: audio_client_destroy(audio_client);
 fin_0: return -1;
 }
 
