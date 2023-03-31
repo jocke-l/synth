@@ -172,3 +172,19 @@ void audio_client_destroy(AudioClient *client) {
 static void audio_shutdown_callback(void *) {
 }
 
+static double g_sinewave_table[65536];
+static const unsigned g_sinewave_table_size = sizeof(g_sinewave_table) / sizeof(g_sinewave_table[0]);
+const double tau = 2 * 3.14159265359;
+
+[[gnu::constructor]]
+void initialize_sinewave_table(void)
+{
+    for (unsigned i = 0; i < g_sinewave_table_size; i++)
+        g_sinewave_table[i] = __builtin_sin(tau * (i / (double)g_sinewave_table_size));
+}
+
+double audio_sin_turns(double value)
+{
+    const double fraction = value - (long long)value;
+    return g_sinewave_table[(unsigned long long)(fraction * (double)g_sinewave_table_size) % g_sinewave_table_size];
+}

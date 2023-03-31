@@ -1,9 +1,8 @@
-#include <math.h>
-#include <stdlib.h>
-
 #include "synth.h"
 
-#define PI 3.14159265359
+#include "audio.h"
+#include <math.h>
+#include <stdlib.h>
 
 static double square_oscillator(double time, double frequency, double amplitude, int num_harmonics);
 static double sine_oscillator(double time, double frequency, double amplitude);
@@ -28,7 +27,7 @@ double synth_callback(double time, const void* context) {
 }
 
 static double sine_oscillator(double time, double frequency, double amplitude) {
-    return sin(2 * PI * frequency * time) * amplitude;
+    return audio_sin_turns(frequency * time) * amplitude;
 }
 
 static double square_oscillator(
