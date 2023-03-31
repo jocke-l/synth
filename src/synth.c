@@ -46,6 +46,7 @@ static double square_oscillator(
     return square;
 }
 
+[[maybe_unused]]
 static double sawtooth_oscillator(
     double time,
     double frequency,
@@ -61,6 +62,7 @@ static double sawtooth_oscillator(
     return sawtooth;
 }
 
+[[maybe_unused]]
 static double triangle_oscillator(
     double time,
     double frequency,
@@ -79,6 +81,7 @@ static double triangle_oscillator(
     return triangle;
 }
 
+[[maybe_unused]]
 static double white_noise(double amplitude) {
     return (((double)rand()) / (double)RAND_MAX) * amplitude;
 }

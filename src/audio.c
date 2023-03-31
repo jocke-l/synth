@@ -169,6 +169,6 @@ void audio_client_destroy(AudioClient *client) {
     free(client);
 }
 
-static void audio_shutdown_callback(void *args) {
+static void audio_shutdown_callback(void *) {
 }
 

@@ -5,7 +5,7 @@
 
 static void on_quit_event(void*);
 
-int main(int argc, char **argv) {
+int main(void) {
     Synth synth = (Synth) {
         .volume = 0.3,
     };
