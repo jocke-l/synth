@@ -167,6 +167,7 @@ fin_0: return NULL;
 void audio_client_destroy(AudioClient *client) {
     jack_deactivate(client->jack_client);
     jack_client_close(client->jack_client);
+    *client = audio_client_invalid;
     free(client);
 }
 
