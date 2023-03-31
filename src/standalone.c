@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <unistd.h>
-
 #include "audio.h"
 #include "nuklear.h"
 #include "synth.h"
