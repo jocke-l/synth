@@ -102,8 +102,18 @@ void ui_handle_events(const UI *ui)
     SDL_Event evt;
     nk_input_begin(ui->nuklear_context);
     while (SDL_PollEvent(&evt)) {
-        if (evt.type == SDL_QUIT && ui->on_quit_callback)
+        if (evt.type == SDL_QUIT && ui->on_quit_callback) {
             ui->on_quit_callback(ui->on_quit_context);
+            continue;
+        }
+#ifndef NDEBUG
+        if (evt.type == SDL_KEYDOWN && evt.key.keysym.sym == SDLK_ESCAPE) {
+            if (ui->on_quit_callback) {
+                ui->on_quit_callback(ui->on_quit_context);
+                continue;
+            }
+        }
+#endif
         nk_sdl_handle_event(&evt);
     }
     nk_input_end(ui->nuklear_context);
