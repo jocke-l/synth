@@ -6,8 +6,6 @@
 #include <jack/jack.h>
 #include <jack/types.h>
 
-#include "common.h"
-
 #define AUDIO_NUMBER_OF_OUTPUTS 2
 
 struct AudioClient {
