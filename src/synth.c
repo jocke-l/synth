@@ -5,6 +5,12 @@
 
 #define PI 3.14159265359
 
+static double square_oscillator(double time, double frequency, double amplitude, int num_harmonics);
+static double sine_oscillator(double time, double frequency, double amplitude);
+static double sawtooth_oscillator(double time, double frequency, double amplitude, int num_harmonics);
+static double triangle_oscillator(double time, double frequency, double amplitude, int num_harmonics);
+static double white_noise(double amplitude);
+
 double synth_callback(double time, const void* context) {
     const Synth *synth = context;
     return square_oscillator(
@@ -21,11 +27,11 @@ double synth_callback(double time, const void* context) {
     );
 }
 
-double sine_oscillator(double time, double frequency, double amplitude) {
+static double sine_oscillator(double time, double frequency, double amplitude) {
     return sin(2 * PI * frequency * time) * amplitude;
 }
 
-double square_oscillator(
+static double square_oscillator(
     double time,
     double frequency,
     double amplitude,
@@ -33,14 +39,14 @@ double square_oscillator(
 ) {
     double square = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
-        int k = 2 * i + 1;
+        double k = 2.0 * i + 1.0;
         square += 1.0 / k * sine_oscillator(time, k * frequency, amplitude);
     }
 
     return square;
 }
 
-double sawtooth_oscillator(
+static double sawtooth_oscillator(
     double time,
     double frequency,
     double amplitude,
@@ -48,14 +54,14 @@ double sawtooth_oscillator(
 ) {
     double sawtooth = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
-        int k = i + 1;
+        double k = i + 1.0;
         sawtooth += sine_oscillator(time, k * frequency, amplitude) / k;
     }
 
     return sawtooth;
 }
 
-double triangle_oscillator(
+static double triangle_oscillator(
     double time,
     double frequency,
     double amplitude,
@@ -63,9 +69,9 @@ double triangle_oscillator(
 ) {
     double triangle = 0.0;
     for (int i = 0; i < num_harmonics; i++) {
-        int k = 2 * i + 1;
+        double k = 2.0 * i + 1.0;
         triangle += (
-            (pow(-1, (k - 1) / 2.0) / pow(k, 2)) *
+            (pow(-1.0, (k - 1.0) / 2.0) / pow(k, 2.0)) *
             sine_oscillator(time, k * frequency, amplitude)
         );
     }
@@ -73,8 +79,8 @@ double triangle_oscillator(
     return triangle;
 }
 
-double white_noise(double amplitude) {
-    return rand() / RAND_MAX  * amplitude;
+static double white_noise(double amplitude) {
+    return (((double)rand()) / (double)RAND_MAX) * amplitude;
 }
 
 #include "nuklear.h"
