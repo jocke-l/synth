@@ -172,7 +172,7 @@ void audio_client_destroy(AudioClient *client) {
 static void audio_shutdown_callback(void *) {
 }
 
-static double g_sinewave_table[65536];
+static double g_sinewave_table[0x100000];
 static const unsigned g_sinewave_table_size = sizeof(g_sinewave_table) / sizeof(g_sinewave_table[0]);
 const double tau = 2 * 3.14159265359;
 
