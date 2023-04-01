@@ -2,12 +2,26 @@
 #include "nuklear.h"
 #include <SDL2/SDL.h>
 
-NK_API struct nk_context *nk_sdl_init(SDL_Window *win, SDL_Renderer *renderer);
-NK_API void nk_sdl_font_stash_begin(struct nk_font_atlas **atlas);
-NK_API void nk_sdl_font_stash_end(void);
-NK_API int nk_sdl_handle_event(SDL_Event *evt);
-NK_API void nk_sdl_render(enum nk_anti_aliasing);
-NK_API void nk_sdl_shutdown(void);
+struct nk_sdl_device {
+    struct nk_buffer cmds;
+    struct nk_draw_null_texture tex_null;
+    SDL_Texture *font_tex;
+};
+
+struct nk_sdl {
+    SDL_Window *win;
+    SDL_Renderer *renderer;
+    struct nk_sdl_device ogl;
+    struct nk_context ctx;
+    struct nk_font_atlas atlas;
+};
+
+NK_API struct nk_sdl nk_sdl_init(SDL_Window *win, SDL_Renderer *renderer);
+NK_API void nk_sdl_font_stash_begin(struct nk_sdl *, struct nk_font_atlas **);
+NK_API void nk_sdl_font_stash_end(struct nk_sdl *);
+NK_API int nk_sdl_handle_event(struct nk_sdl *, SDL_Event *evt);
+NK_API void nk_sdl_render(struct nk_sdl *, enum nk_anti_aliasing);
+NK_API void nk_sdl_deinit(struct nk_sdl *);
 
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
 /* Metal API does not support cliprects with negative coordinates or large

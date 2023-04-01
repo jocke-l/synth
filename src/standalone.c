@@ -16,6 +16,7 @@ int main(void) {
 
     if (ui_init() < 0)
         goto fin_1;
+
     UI* ui = ui_create("standalone", 1200, 800);
     if (!ui)
         goto fin_2;

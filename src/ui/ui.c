@@ -7,9 +7,7 @@
 #include <nuklear/nuklear_sdl_renderer.h>
 
 struct UIContext {
-    SDL_Window *sdl_window;
-    SDL_Renderer *sdl_renderer;
-    struct nk_context *nuklear_context;
+    struct nk_sdl sdl;
 
     void (*on_quit_callback)(void*);
     void *on_quit_context;
@@ -35,18 +33,18 @@ UI* ui_create(const char *window_name, int window_width, int window_height)
         goto fin_0;
     *ui = ui_invalid;
 
-    ui->sdl_window = SDL_CreateWindow(window_name,
+    ui->sdl.win = SDL_CreateWindow(window_name,
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         window_width, window_height, SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
 
-    if (ui->sdl_window == NULL) {
+    if (ui->sdl.win == NULL) {
         SDL_Log("Error SDL_CreateWindow %s", SDL_GetError());
         goto fin_1;
     }
 
-    ui->sdl_renderer = SDL_CreateRenderer(ui->sdl_window, -1,
+    ui->sdl.renderer = SDL_CreateRenderer(ui->sdl.win, -1,
         SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
-    if (ui->sdl_renderer == NULL) {
+    if (ui->sdl.renderer == NULL) {
         SDL_Log("Error SDL_CreateRenderer %s", SDL_GetError());
         goto fin_2;
     }
@@ -56,53 +54,50 @@ UI* ui_create(const char *window_name, int window_width, int window_height)
         int render_w, render_h;
         int window_w, window_h;
         float scale_x, scale_y;
-        SDL_GetRendererOutputSize(ui->sdl_renderer, &render_w, &render_h);
-        SDL_GetWindowSize(ui->sdl_window, &window_w, &window_h);
+        SDL_GetRendererOutputSize(ui->sdl.renderer, &render_w, &render_h);
+        SDL_GetWindowSize(ui->sdl.win, &window_w, &window_h);
         scale_x = (float)(render_w) / (float)(window_w);
         scale_y = (float)(render_h) / (float)(window_h);
-        SDL_RenderSetScale(ui->sdl_renderer, scale_x, scale_y);
+        SDL_RenderSetScale(ui->sdl.renderer, scale_x, scale_y);
         font_scale = scale_y;
     }
 
-    ui->nuklear_context = nk_sdl_init(ui->sdl_window, ui->sdl_renderer);
-    if (!ui->nuklear_context)
-        goto fin_3;
+    ui->sdl = nk_sdl_init(ui->sdl.win, ui->sdl.renderer);
     {
         struct nk_font_atlas *atlas;
         struct nk_font_config config = nk_font_config(0);
-        nk_sdl_font_stash_begin(&atlas);
+        nk_sdl_font_stash_begin(&ui->sdl, &atlas);
         struct nk_font *font = nk_font_atlas_add_default(atlas, 13 * font_scale, &config);
-        nk_sdl_font_stash_end();
+        nk_sdl_font_stash_end(&ui->sdl);
 
         font->handle.height /= font_scale;
-        nk_style_set_font(ui->nuklear_context, &font->handle);
+        nk_style_set_font(&ui->sdl.ctx, &font->handle);
     }
 
     return ui;
-fin_3: SDL_DestroyRenderer(ui->sdl_renderer);
-fin_2: SDL_DestroyWindow(ui->sdl_window);
+fin_2: SDL_DestroyWindow(ui->sdl.win);
 fin_1: free(ui);
 fin_0: return NULL;
 }
 
 void ui_destroy(UI *ui)
 {
-    nk_sdl_shutdown();
-    SDL_DestroyRenderer(ui->sdl_renderer);
-    SDL_DestroyWindow(ui->sdl_window);
+    nk_sdl_deinit(&ui->sdl);
+    SDL_DestroyRenderer(ui->sdl.renderer);
+    SDL_DestroyWindow(ui->sdl.win);
     *ui = ui_invalid;
     free(ui);
 }
 
-struct nk_context *ui_get_nuklear_context(const UI *ui)
+struct nk_context *ui_get_nuklear_context(UI *ui)
 {
-    return ui->nuklear_context;
+    return &ui->sdl.ctx;
 }
 
-void ui_handle_events(const UI *ui)
+void ui_handle_events(UI *ui)
 {
     SDL_Event evt;
-    nk_input_begin(ui->nuklear_context);
+    nk_input_begin(&ui->sdl.ctx);
     while (SDL_PollEvent(&evt)) {
         if (evt.type == SDL_QUIT && ui->on_quit_callback) {
             ui->on_quit_callback(ui->on_quit_context);
@@ -116,16 +111,16 @@ void ui_handle_events(const UI *ui)
             }
         }
 #endif
-        nk_sdl_handle_event(&evt);
+        nk_sdl_handle_event(&ui->sdl, &evt);
     }
-    nk_input_end(ui->nuklear_context);
+    nk_input_end(&ui->sdl.ctx);
 }
 
-void ui_render_frame(const UI *ui)
+void ui_render_frame(UI *ui)
 {
-    SDL_RenderClear(ui->sdl_renderer);
-    nk_sdl_render(NK_ANTI_ALIASING_ON);
-    SDL_RenderPresent(ui->sdl_renderer);
+    SDL_RenderClear(ui->sdl.renderer);
+    nk_sdl_render(&ui->sdl, NK_ANTI_ALIASING_ON);
+    SDL_RenderPresent(ui->sdl.renderer);
 }
 
 void ui_set_on_quit_event(UI *ui, void(*on_quit)(void*), void *context)
