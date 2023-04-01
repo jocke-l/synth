@@ -1,12 +1,13 @@
-synth_exe = executable('synth', [
-  'audio.c',
-  'nuklear.c',
-  'nuklear_sdl_renderer.c',
+subdir('nuklear')
+subdir('ui')
+subdir('audio')
+subdir('synth')
+
+standalone_exe = executable('standalone', [
   'standalone.c',
-  'synth.c',
-  'ui.c',
 ], dependencies: [
-  sdl_dep,
-  jack2_dep,
-  m_dep
+  audio_dep,
+  nuklear_dep,
+  synth_dep,
+  ui_dep,
 ])

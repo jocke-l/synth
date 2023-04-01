@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-#include "nuklear.h"
-#include "nuklear_sdl_renderer.h"
+#include <nuklear/nuklear.h>
+#include <nuklear/nuklear_sdl_renderer.h>
 
 struct UIContext {
     SDL_Window *sdl_window;
@@ -20,6 +20,7 @@ int ui_init(void)
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         return -1;
+    return 0;
 }
 
 void ui_deinit(void)

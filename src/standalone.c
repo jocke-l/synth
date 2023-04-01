@@ -1,7 +1,7 @@
-#include "audio.h"
-#include "nuklear.h"
-#include "synth.h"
-#include "ui.h"
+#include <audio/audio.h>
+#include <nuklear/nuklear.h>
+#include <synth/synth.h>
+#include <ui/ui.h>
 
 static void on_quit_event(void*);
 

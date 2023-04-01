@@ -6,20 +6,18 @@ project('synth', ['c'],
     'buildtype=release',
   ])
 
+if not meson.is_subproject()
+  add_global_arguments([
+    '-Werror=return-type'
+  ], language: 'c')
+endif
+
 sdl_dep = dependency('SDL2')
 jack2_dep = dependency('jack')
 
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required: true)
 
-# Ensure Nuklear is downloaded
-run_command('git', [
-  'submodule',
-  'update',
-  '--init',
-  '--recursive'
-], check: true)
-
 subdir('src')
 
-run_target('run', command: synth_exe)
+run_target('run', command: standalone_exe)
