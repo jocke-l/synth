@@ -17,7 +17,9 @@ int main(void) {
     if (ui_init() < 0)
         goto fin_1;
 
-    UI* ui = ui_create("standalone", 1200, 800);
+    const unsigned window_width = 280;
+    const unsigned window_height = 300;
+    UI* ui = ui_create("synth", window_width, window_height);
     if (!ui)
         goto fin_2;
 
@@ -27,10 +29,7 @@ int main(void) {
         ui_handle_events(ui);
 
         struct nk_context *nuklear_context = ui_get_nuklear_context(ui);
-        if (nk_begin(nuklear_context, "synth", nk_rect(50, 50, 230, 250),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-            NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE
-        )) {
+        if (nk_begin(nuklear_context, "synth", nk_rect(0, 0, window_width, window_height), 0)) {
             synth_update_ui(nuklear_context, &synth);
         }
         nk_end(nuklear_context);
