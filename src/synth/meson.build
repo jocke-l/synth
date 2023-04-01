@@ -1,5 +1,6 @@
 synth_lib = library('synth', [
   'synth.c',
+  'ui.c',
 ], dependencies: [
   audio_dep,
   nuklear_dep,
