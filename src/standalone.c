@@ -7,7 +7,15 @@ static void on_quit_event(void*);
 
 int main(void) {
     Synth synth = (Synth) {
-        .volume = 0.3,
+        .square_frequency = 110.0,
+        .square_amplitude = 0.3,
+        .square_harmonics = 20,
+
+        .inner_time_warp_frequency = 0.05,
+        .inner_time_warp_amplitude = 1.0,
+
+        .outer_time_warp_frequency = 55.0,
+        .outer_time_warp_amplitude = 0.015,
     };
 
     AudioClient* audio_client = audio_client_create("synth", synth_callback, &synth);

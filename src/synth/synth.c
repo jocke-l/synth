@@ -11,18 +11,18 @@ static double triangle_oscillator(double time, double frequency, double amplitud
 static double white_noise(double amplitude);
 
 double synth_callback(double time, const void* context) {
-    const Synth *synth = context;
+    const Synth synth = *(const Synth *)context;
     return square_oscillator(
         (
             time + sine_oscillator(
-                time + sine_oscillator(time, 0.05, 1),
-                55,
-                0.015
+                time + sine_oscillator(time, synth.inner_time_warp_frequency, synth.inner_time_warp_amplitude),
+                synth.outer_time_warp_frequency,
+                synth.outer_time_warp_amplitude
             )
         ),
-        110,
-        synth->volume,
-        20
+        synth.square_frequency,
+        synth.square_amplitude,
+        synth.square_harmonics
     );
 }
 
