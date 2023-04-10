@@ -9,6 +9,7 @@ int main(void) {
     Synth synth = (Synth) {
         .square_frequency = 110.0,
         .square_amplitude = 0.3,
+        .square_k_value = 2.0,
         .square_harmonics = 20,
 
         .inner_time_warp_frequency = 0.05,

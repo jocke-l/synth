@@ -3,6 +3,7 @@
 typedef struct {
     _Atomic double square_frequency;
     _Atomic double square_amplitude;
+    _Atomic double square_k_value;
     _Atomic int square_harmonics;
 
     _Atomic double inner_time_warp_frequency;

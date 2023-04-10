@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static double square_oscillator(double time, double frequency, double amplitude, int num_harmonics);
+static double square_oscillator(double time, double frequency, double amplitude, double k_value, int num_harmonics);
 static double sine_oscillator(double time, double frequency, double amplitude);
 static double sawtooth_oscillator(double time, double frequency, double amplitude, int num_harmonics);
 static double triangle_oscillator(double time, double frequency, double amplitude, int num_harmonics);
@@ -22,6 +22,7 @@ double synth_callback(double time, const void* context) {
         ),
         synth.square_frequency,
         synth.square_amplitude,
+        synth.square_k_value,
         synth.square_harmonics
     );
 }
@@ -34,11 +35,12 @@ static double square_oscillator(
     double time,
     double frequency,
     double amplitude,
+    double k_value,
     int num_harmonics
 ) {
     double square = 0.0;
-    for (int i = 0; i < num_harmonics; i++) {
-        double k = 2.0 * i + 1.0;
+    double k = 1.0;
+    for (int i = 0; i < num_harmonics; i++, k += k_value) {
         square += 1.0 / k * sine_oscillator(time, k * frequency, amplitude);
     }
 
