@@ -20,17 +20,22 @@ int main(void) {
     };
 
     AudioClient* audio_client = audio_client_create("synth", synth_callback, &synth);
-    if (!audio_client)
-        goto fin_0;
+    if (!audio_client) {
+        return -1;
+    }
 
-    if (ui_init() < 0)
-        goto fin_1;
+    if (ui_init() < 0) {
+        return -1;
+    }
 
     const unsigned window_width = 280;
     const unsigned window_height = 300;
     UI* ui = ui_create("synth", window_width, window_height);
-    if (!ui)
-        goto fin_2;
+    if (!ui) {
+        ui_deinit();
+        audio_client_destroy(audio_client);
+        return -1;
+    }
 
     int should_quit = 0;
     ui_set_on_quit_event(ui, on_quit_event, &should_quit);
@@ -49,10 +54,6 @@ int main(void) {
     ui_deinit();
     audio_client_destroy(audio_client);
     return 0;
-
-fin_2: ui_deinit();
-fin_1: audio_client_destroy(audio_client);
-fin_0: return -1;
 }
 
 static void on_quit_event(void *context)

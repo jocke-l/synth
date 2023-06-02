@@ -29,8 +29,9 @@ void ui_deinit(void)
 UI* ui_create(const char *window_name, int window_width, int window_height)
 {
     UI* ui = malloc(sizeof(UI));
-    if (!ui)
-        goto fin_0;
+    if (!ui) {
+        return NULL;
+    }
     *ui = ui_invalid;
 
     ui->sdl.win = SDL_CreateWindow(window_name,
@@ -39,14 +40,17 @@ UI* ui_create(const char *window_name, int window_width, int window_height)
 
     if (ui->sdl.win == NULL) {
         SDL_Log("Error SDL_CreateWindow %s", SDL_GetError());
-        goto fin_1;
+        free(ui);
+        return NULL;
     }
 
     ui->sdl.renderer = SDL_CreateRenderer(ui->sdl.win, -1,
         SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
     if (ui->sdl.renderer == NULL) {
         SDL_Log("Error SDL_CreateRenderer %s", SDL_GetError());
-        goto fin_2;
+        SDL_DestroyWindow(ui->sdl.win);
+        free(ui);
+        return NULL;
     }
 
     float font_scale = 1;
@@ -75,9 +79,6 @@ UI* ui_create(const char *window_name, int window_width, int window_height)
     }
 
     return ui;
-fin_2: SDL_DestroyWindow(ui->sdl.win);
-fin_1: free(ui);
-fin_0: return NULL;
 }
 
 void ui_destroy(UI *ui)
