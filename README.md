@@ -15,6 +15,5 @@ $ meson build
 # Build
 $ ninja -C build
 ```
-*Note: You might want to lower the sound volume as it will start playing immediately.*
 
 You can then run the produced binary with `./build/src/standalone`.
